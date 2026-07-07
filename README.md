@@ -12,6 +12,18 @@ npm run dev
 
 Il sito è disponibile su [http://localhost:3000](http://localhost:3000).
 
+## Docker
+
+```bash
+docker compose up --build      # oppure:
+docker build -t tramare-bnb .
+docker run -p 3000:3000 tramare-bnb
+```
+
+L'immagine usa l'output `standalone` di Next.js (build multi-stage, utente non
+root): il container serve il sito su http://localhost:3000 senza bisogno di
+Node.js sul sistema host.
+
 ## Caratteristiche
 
 - Hero a schermo intero con slogan e call-to-action

@@ -6,6 +6,15 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "port": 3000
+    },
+    {
+      "name": "progetto-allegra",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "cd /Users/adrianapiccolo/Desktop/workspace/progetto_allegra && PORT=3457 BROWSER=none npx react-scripts start"
+      ],
+      "port": 3457
     }
   ]
 }
