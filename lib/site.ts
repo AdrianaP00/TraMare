@@ -17,11 +17,11 @@ import {
 
 export const site = {
   name: "TraMare",
-  tagline: "B&B Boutique · Napoli",
+  tagline: "B&B · Portici · Napoli",
   slogan: "Eleganza partenopea, tra mare e storia",
-  phone: "+39 081 552 4173",
-  phoneHref: "tel:+390815524173",
-  address: "Via Santa Lucia 42, 80132 Napoli",
+  phone: "+39 3519414986",
+  phoneHref: "tel:+39 3519414986",
+  address: "Via Carlo e Luigi Giordano 14, 80055, Portici, Napoli",
 };
 
 export type Service = {
