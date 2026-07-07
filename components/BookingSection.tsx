@@ -12,35 +12,42 @@ import {
 import { useEffect, useRef, useState } from "react";
 import BookingCalendar from "@/components/BookingCalendar";
 import Reveal from "@/components/Reveal";
+import type { Dictionary, Locale } from "@/lib/i18n";
 import { site } from "@/lib/site";
 
 const MIN_GUESTS = 1;
 const MAX_GUESTS = 6;
 
-function formatDate(date: Date | null): string {
-  if (!date) return "Aggiungi data";
-  return date.toLocaleDateString("it-IT", {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-  });
-}
+type BookingSectionProps = {
+  lang: Locale;
+  t: Dictionary["booking"];
+};
 
-function formatDateLong(date: Date): string {
-  return date.toLocaleDateString("it-IT", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-}
-
-export default function BookingSection() {
+export default function BookingSection({ lang, t }: BookingSectionProps) {
   const [checkIn, setCheckIn] = useState<Date | null>(null);
   const [checkOut, setCheckOut] = useState<Date | null>(null);
   const [guests, setGuests] = useState(2);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [result, setResult] = useState<"idle" | "missing" | "available">("idle");
   const widgetRef = useRef<HTMLDivElement>(null);
+
+  const dateLocale = lang === "it" ? "it-IT" : "en-GB";
+
+  const formatDate = (date: Date | null) =>
+    date
+      ? date.toLocaleDateString(dateLocale, {
+          weekday: "short",
+          day: "numeric",
+          month: "short",
+        })
+      : t.addDate;
+
+  const formatDateLong = (date: Date) =>
+    date.toLocaleDateString(dateLocale, {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
 
   useEffect(() => {
     if (!calendarOpen) return;
@@ -78,6 +85,9 @@ export default function BookingSection() {
       ? Math.round((checkOut.getTime() - checkIn.getTime()) / 86_400_000)
       : 0;
 
+  const guestsWord = guests === 1 ? t.guestSingular : t.guestPlural;
+  const nightsWord = nights === 1 ? t.nightSingular : t.nightPlural;
+
   const dateFieldClasses =
     "flex flex-1 cursor-pointer items-center gap-3 rounded-2xl border border-linen bg-cream px-5 py-4 text-left transition-all duration-300 hover:border-bronze/50 hover:shadow-md hover:shadow-bronze/10";
 
@@ -89,10 +99,10 @@ export default function BookingSection() {
             <div className="mb-6 flex items-center justify-between gap-4">
               <div>
                 <p className="text-xs font-medium uppercase tracking-[0.3em] text-bronze">
-                  Prenota il tuo soggiorno
+                  {t.eyebrow}
                 </p>
                 <h2 className="mt-2 font-serif text-2xl text-ink md:text-3xl">
-                  Verifica la disponibilità
+                  {t.title}
                 </h2>
               </div>
               <CalendarDays className="hidden h-10 w-10 text-bronze/40 md:block" />
@@ -107,7 +117,7 @@ export default function BookingSection() {
                 <CalendarDays className="h-5 w-5 shrink-0 text-bronze" />
                 <span>
                   <span className="block text-[11px] font-medium uppercase tracking-wider text-taupe">
-                    Check-in
+                    {t.checkIn}
                   </span>
                   <span className="mt-0.5 block text-sm font-medium capitalize text-ink">
                     {formatDate(checkIn)}
@@ -123,7 +133,7 @@ export default function BookingSection() {
                 <CalendarDays className="h-5 w-5 shrink-0 text-bronze" />
                 <span>
                   <span className="block text-[11px] font-medium uppercase tracking-wider text-taupe">
-                    Check-out
+                    {t.checkOut}
                   </span>
                   <span className="mt-0.5 block text-sm font-medium capitalize text-ink">
                     {formatDate(checkOut)}
@@ -135,16 +145,16 @@ export default function BookingSection() {
                 <Users className="h-5 w-5 shrink-0 text-bronze" />
                 <span className="flex-1">
                   <span className="block text-[11px] font-medium uppercase tracking-wider text-taupe">
-                    Ospiti
+                    {t.guestsLabel}
                   </span>
                   <span className="mt-0.5 block text-sm font-medium text-ink">
-                    {guests} {guests === 1 ? "ospite" : "ospiti"}
+                    {guests} {guestsWord}
                   </span>
                 </span>
                 <span className="flex items-center gap-1">
                   <button
                     type="button"
-                    aria-label="Riduci ospiti"
+                    aria-label={t.decreaseGuests}
                     disabled={guests <= MIN_GUESTS}
                     onClick={() => setGuests((count) => Math.max(MIN_GUESTS, count - 1))}
                     className="flex h-8 w-8 items-center justify-center rounded-full border border-linen text-taupe-dark transition-colors hover:border-bronze hover:text-bronze disabled:cursor-not-allowed disabled:opacity-30"
@@ -153,7 +163,7 @@ export default function BookingSection() {
                   </button>
                   <button
                     type="button"
-                    aria-label="Aumenta ospiti"
+                    aria-label={t.increaseGuests}
                     disabled={guests >= MAX_GUESTS}
                     onClick={() => setGuests((count) => Math.min(MAX_GUESTS, count + 1))}
                     className="flex h-8 w-8 items-center justify-center rounded-full border border-linen text-taupe-dark transition-colors hover:border-bronze hover:text-bronze disabled:cursor-not-allowed disabled:opacity-30"
@@ -169,14 +179,12 @@ export default function BookingSection() {
                 className="flex items-center justify-center gap-2 rounded-2xl bg-bronze px-8 py-4 text-sm font-medium uppercase tracking-[0.15em] text-white shadow-lg shadow-bronze/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-bronze-dark lg:shrink-0"
               >
                 <Search className="h-4 w-4" />
-                Verifica disponibilità
+                {t.verify}
               </button>
             </div>
 
             {result === "missing" && (
-              <p className="mt-4 text-sm text-bronze-dark">
-                Seleziona le date di check-in e check-out per continuare.
-              </p>
+              <p className="mt-4 text-sm text-bronze-dark">{t.missingDates}</p>
             )}
 
             {result === "available" && checkIn && checkOut && (
@@ -184,14 +192,11 @@ export default function BookingSection() {
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="mt-0.5 h-6 w-6 shrink-0 text-bronze" />
                   <div>
-                    <p className="font-serif text-lg text-ink">
-                      Ottime notizie: siamo disponibili!
-                    </p>
+                    <p className="font-serif text-lg text-ink">{t.successTitle}</p>
                     <p className="mt-1 text-sm text-taupe-dark">
-                      Dal {formatDateLong(checkIn)} al {formatDateLong(checkOut)} ·{" "}
-                      {nights} {nights === 1 ? "notte" : "notti"} · {guests}{" "}
-                      {guests === 1 ? "ospite" : "ospiti"}. Chiamaci per confermare la tua
-                      prenotazione.
+                      {t.from} {formatDateLong(checkIn)} {t.to}{" "}
+                      {formatDateLong(checkOut)} · {nights} {nightsWord} · {guests}{" "}
+                      {guestsWord}. {t.callToConfirm}
                     </p>
                   </div>
                 </div>
@@ -200,7 +205,7 @@ export default function BookingSection() {
                   className="flex shrink-0 items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-ink/85"
                 >
                   <Phone className="h-4 w-4" />
-                  Chiama ora
+                  {t.callNow}
                 </a>
               </div>
             )}
@@ -208,7 +213,12 @@ export default function BookingSection() {
 
           {calendarOpen && (
             <div className="absolute left-0 right-0 top-full z-30 mt-3 md:left-8 md:right-8">
-              <BookingCalendar checkIn={checkIn} checkOut={checkOut} onSelect={selectDate} />
+              <BookingCalendar
+                checkIn={checkIn}
+                checkOut={checkOut}
+                onSelect={selectDate}
+                labels={t.calendar}
+              />
             </div>
           )}
         </div>

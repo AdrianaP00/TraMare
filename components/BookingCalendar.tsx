@@ -2,23 +2,9 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import type { Dictionary } from "@/lib/i18n";
 
-const WEEKDAYS = ["Lu", "Ma", "Me", "Gi", "Ve", "Sa", "Do"];
-
-const MONTHS = [
-  "Gennaio",
-  "Febbraio",
-  "Marzo",
-  "Aprile",
-  "Maggio",
-  "Giugno",
-  "Luglio",
-  "Agosto",
-  "Settembre",
-  "Ottobre",
-  "Novembre",
-  "Dicembre",
-];
+type CalendarLabels = Dictionary["booking"]["calendar"];
 
 function startOfDay(date: Date): Date {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -47,6 +33,7 @@ type BookingCalendarProps = {
   checkIn: Date | null;
   checkOut: Date | null;
   onSelect: (date: Date) => void;
+  labels: CalendarLabels;
 };
 
 function MonthGrid({
@@ -55,6 +42,7 @@ function MonthGrid({
   checkIn,
   checkOut,
   onSelect,
+  labels,
 }: BookingCalendarProps & { year: number; month: number }) {
   const today = startOfDay(new Date());
   const cells = getMonthCells(year, month);
@@ -62,10 +50,10 @@ function MonthGrid({
   return (
     <div className="w-full">
       <p className="mb-4 text-center font-serif text-lg text-ink">
-        {MONTHS[month]} {year}
+        {labels.months[month]} {year}
       </p>
       <div className="grid grid-cols-7 gap-y-1 text-center">
-        {WEEKDAYS.map((day) => (
+        {labels.weekdays.map((day) => (
           <span
             key={day}
             className="pb-2 text-[11px] font-medium uppercase tracking-wider text-taupe"
@@ -111,7 +99,12 @@ function MonthGrid({
   );
 }
 
-export default function BookingCalendar({ checkIn, checkOut, onSelect }: BookingCalendarProps) {
+export default function BookingCalendar({
+  checkIn,
+  checkOut,
+  onSelect,
+  labels,
+}: BookingCalendarProps) {
   const now = new Date();
   const [offset, setOffset] = useState(0);
 
@@ -123,19 +116,17 @@ export default function BookingCalendar({ checkIn, checkOut, onSelect }: Booking
       <div className="mb-2 flex items-center justify-between">
         <button
           type="button"
-          aria-label="Mese precedente"
+          aria-label={labels.prevMonth}
           disabled={offset === 0}
           onClick={() => setOffset((value) => Math.max(0, value - 1))}
           className="rounded-full p-2 text-taupe-dark transition-colors hover:bg-sand disabled:cursor-not-allowed disabled:opacity-30"
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
-        <p className="text-xs uppercase tracking-[0.25em] text-taupe">
-          Seleziona le date
-        </p>
+        <p className="text-xs uppercase tracking-[0.25em] text-taupe">{labels.hint}</p>
         <button
           type="button"
-          aria-label="Mese successivo"
+          aria-label={labels.nextMonth}
           onClick={() => setOffset((value) => value + 1)}
           className="rounded-full p-2 text-taupe-dark transition-colors hover:bg-sand"
         >
@@ -150,6 +141,7 @@ export default function BookingCalendar({ checkIn, checkOut, onSelect }: Booking
           checkIn={checkIn}
           checkOut={checkOut}
           onSelect={onSelect}
+          labels={labels}
         />
         <div className="hidden w-full md:block">
           <MonthGrid
@@ -158,6 +150,7 @@ export default function BookingCalendar({ checkIn, checkOut, onSelect }: Booking
             checkIn={checkIn}
             checkOut={checkOut}
             onSelect={onSelect}
+            labels={labels}
           />
         </div>
       </div>

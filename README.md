@@ -20,16 +20,24 @@ Il sito è disponibile su [http://localhost:3000](http://localhost:3000).
 - Navbar trasparente che diventa solida allo scroll
 - Animazioni di reveal allo scroll (IntersectionObserver)
 - Layout completamente responsive
-- Nessun backend, nessuna API: tutti i dati sono statici in `lib/site.ts`
+- **Multilingua (i18n)**: italiano su `/it` e inglese su `/en`, con switcher IT/EN
+  nella navbar; la root `/` reindirizza in base alla lingua del browser (middleware)
+- Nessun backend, nessuna API: tutti i dati sono statici in `lib/`
 
 ## Struttura
 
 ```
-app/          Layout, pagina principale, favicon
-components/   Componenti riutilizzabili (Navbar, Hero, BookingSection, ...)
-lib/          Dati statici del sito (testi, servizi, immagini)
-styles/       Stili globali e theme Tailwind
+app/[lang]/       Layout e pagina principale, una route statica per lingua
+components/       Componenti riutilizzabili (Navbar, Hero, BookingSection, ...)
+lib/site.ts       Dati non testuali (telefono, indirizzo, icone, immagini)
+lib/dictionaries/ Testi localizzati (it.ts, en.ts)
+lib/i18n.ts       Configurazione lingue e accesso ai dizionari
+middleware.ts     Redirect / → /it o /en in base ad Accept-Language
+styles/           Stili globali e theme Tailwind
 ```
+
+Per aggiungere una lingua: creare `lib/dictionaries/<codice>.ts` sul modello di
+`en.ts` e aggiungere il codice all'array `locales` in `lib/i18n.ts`.
 
 Le immagini placeholder sono servite da Unsplash: per la produzione basta
 sostituire gli URL in `lib/site.ts` con foto reali (anche locali in `public/`).

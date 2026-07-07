@@ -1,18 +1,46 @@
 "use client";
 
 import { Menu, Phone, X } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
+import type { Dictionary, Locale } from "@/lib/i18n";
+import { locales } from "@/lib/i18n";
 import { site } from "@/lib/site";
 
-const navLinks = [
-  { href: "#prenota", label: "Prenota" },
-  { href: "#chi-siamo", label: "Chi siamo" },
-  { href: "#servizi", label: "Servizi" },
-  { href: "#galleria", label: "Galleria" },
-  { href: "#contatti", label: "Contatti" },
-];
+type NavbarProps = {
+  lang: Locale;
+  tagline: string;
+  t: Dictionary["nav"];
+};
 
-export default function Navbar() {
+function LanguageSwitcher({ lang, solid }: { lang: Locale; solid: boolean }) {
+  return (
+    <span className="flex items-center gap-2 text-sm tracking-[0.15em]">
+      {locales.map((locale, index) => (
+        <span key={locale} className="flex items-center gap-2">
+          {index > 0 && (
+            <span className={solid ? "text-taupe/50" : "text-white/50"}>/</span>
+          )}
+          <Link
+            href={`/${locale}`}
+            aria-current={locale === lang ? "page" : undefined}
+            className={`uppercase transition-colors duration-300 hover:text-bronze ${
+              locale === lang
+                ? "font-semibold text-bronze"
+                : solid
+                  ? "text-taupe-dark"
+                  : "text-white/90"
+            }`}
+          >
+            {locale}
+          </Link>
+        </span>
+      ))}
+    </span>
+  );
+}
+
+export default function Navbar({ lang, tagline, t }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -38,19 +66,19 @@ export default function Navbar() {
               solid ? "text-ink" : "text-white"
             }`}
           >
-            TraMare
+            {site.name}
           </span>
           <span
             className={`mt-1 text-[10px] uppercase tracking-[0.3em] transition-colors duration-500 ${
               solid ? "text-bronze" : "text-white/80"
             }`}
           >
-            B&B · Napoli
+            {tagline}
           </span>
         </a>
 
         <ul className="hidden items-center gap-8 md:flex">
-          {navLinks.map((link) => (
+          {t.links.map((link) => (
             <li key={link.href}>
               <a
                 href={link.href}
@@ -63,19 +91,22 @@ export default function Navbar() {
             </li>
           ))}
           <li>
+            <LanguageSwitcher lang={lang} solid={solid} />
+          </li>
+          <li>
             <a
               href={site.phoneHref}
               className="flex items-center gap-2 rounded-full bg-bronze px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-bronze/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-bronze-dark"
             >
               <Phone className="h-4 w-4" />
-              Chiama
+              {t.call}
             </a>
           </li>
         </ul>
 
         <button
           type="button"
-          aria-label={menuOpen ? "Chiudi menu" : "Apri menu"}
+          aria-label={menuOpen ? t.closeMenu : t.openMenu}
           onClick={() => setMenuOpen((open) => !open)}
           className={`rounded-full p-2 transition-colors duration-300 md:hidden ${
             solid ? "text-ink" : "text-white"
@@ -88,7 +119,7 @@ export default function Navbar() {
       {menuOpen && (
         <div className="border-t border-linen bg-cream px-6 pb-8 pt-4 md:hidden">
           <ul className="flex flex-col gap-4">
-            {navLinks.map((link) => (
+            {t.links.map((link) => (
               <li key={link.href}>
                 <a
                   href={link.href}
@@ -99,13 +130,16 @@ export default function Navbar() {
                 </a>
               </li>
             ))}
+            <li>
+              <LanguageSwitcher lang={lang} solid />
+            </li>
             <li className="pt-2">
               <a
                 href={site.phoneHref}
                 className="flex w-full items-center justify-center gap-2 rounded-full bg-bronze px-5 py-3 text-sm font-medium text-white"
               >
                 <Phone className="h-4 w-4" />
-                Chiama ora
+                {t.callNow}
               </a>
             </li>
           </ul>
